@@ -17,7 +17,7 @@
           name="pointId"
           :rules="[{ trigger: 'change', required: true, message: '请选择点位名称!' }]"
         >
-          <a-select v-if="isAdd" ref="select" placeholder="请选择网格员类型" v-model:value="formState.pointId">
+          <a-select v-if="isAdd" ref="select" placeholder="请选择点位名称" v-model:value="formState.pointId">
             <a-select-option :value="item.uniqueId" v-for="item in pointList" :key="item.uniqueId">{{
               item.name
             }}</a-select-option>
@@ -57,7 +57,8 @@
         </a-form-item>
         <a-form-item label="点位标准图" name="reseauUser" v-if="!isAdd">
           <div style="width: 200px">
-            <img :src="fileUrl + formState.standPath" alt="" class="imageDetail" />
+            <a-image :src="fileUrl + formState.standPath" v-if="formState.standPath" alt="" class="imageDetail" />
+            <div v-else>暂无点位标准图</div>
           </div>
         </a-form-item>
         <a-form-item
@@ -73,7 +74,7 @@
               :show-upload-list="false"
               :before-upload="beforeUpload"
             >
-              <img
+              <a-image
                 v-if="formState.image"
                 :src="fileUrl + formState.image"
                 alt="avatar"
@@ -90,7 +91,23 @@
             </a-upload>
           </div>
           <div style="width: 200px" v-else>
-            <img :src="fileUrl + formState.patrolPath" alt="" class="imageDetail" />
+            <a-image :src="fileUrl + formState.patrolPath" alt="" class="imageDetail" />
+          </div>
+        </a-form-item>
+        <a-form-item label="评分参考图" name="reseauUser" v-if="!isAdd">
+          <div style="width: 200px">
+            <a-image
+              :src="fileUrl + formState.annotatedImage"
+              alt=""
+              class="imageDetail"
+              v-if="formState.annotatedImage"
+            />
+            <div v-else>暂无评分参考图</div>
+          </div>
+        </a-form-item>
+        <a-form-item label="评分说明" name="reseauUser" v-if="!isAdd">
+          <div style="width: 200px">
+            {{ formState.comment || '暂无评分说明' }}
           </div>
         </a-form-item>
       </a-form>
@@ -179,18 +196,9 @@
       .then((res: any) => {
         if (res.code === 200) {
           formState.value = res.data.data;
-          (formState.value.time = formState.value.patrolTime
+          formState.value.time = formState.value.patrolTime
             ? `${formState.value.patrolTime[0]}-${formState.value.patrolTime[1]}-${formState.value.patrolTime[2]} ${formState.value.patrolTime[3]}:${formState.value.patrolTime[4]}:${formState.value.patrolTime[5]}`
-            : ''),
-            // userList.value = res.data.data.records.map((item) => {
-            //   return {
-            //     ...item,
-            //     time: item.patrolTime
-            //       ? `${item.patrolTime[0]}-${item.patrolTime[1]}-${item.patrolTime[2]} ${item.patrolTime[3]}:${item.patrolTime[4]}:${item.patrolTime[5]}`
-            //       : '',
-            //   };
-            // });
-            (pagination.value.total = res.data.data.total); // 更新总条数
+            : '';
         } else {
           userList.value = [];
         }

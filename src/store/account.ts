@@ -6,6 +6,9 @@ import { useAuthStore } from '@/plugins';
 import { useLoadingStore } from './loading';
 import { doLogin } from "@/api/basic";
 import { message, Modal } from 'ant-design-vue';
+// import { useAuthStore } from '@/plugins';
+// const { setAuthorities } = useAuthStore();
+// setAuthorities(permissions);
 export interface Profile {
   account: Account;
   permissions: string[];
@@ -28,13 +31,18 @@ export const useAccountStore = defineStore('account', {
       permissions: [] as string[],
       role: '',
       logged: true,
-      fileUrl: 'http://192.168.120.214:4610/file/getFile?path='
+      fileUrl: 'http://192.168.120.214:4610/file/getFile?path=',
+      exportHeader: 'http://192.168.120.214:4610'
+
     };
   },
   actions: {
     getFileUrl(path: string) {
       return this.fileUrl
 
+    },
+    getexportHeader() {
+      return this.exportHeader
     },
     async login(username: string, password: string, code: string, uuidstr: string) {
       console.log(username, password);

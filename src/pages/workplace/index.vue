@@ -101,12 +101,14 @@
     });
   };
   onMounted(async () => {
+    console.log(222, 'ddd');
+
     await getDetail();
   });
   const getYIJI = () => {
     chart = echarts.init(container.value!);
-    var data = firstFloorList.value.map((item) => item.name);
-
+    var data = firstFloorList.value;
+    data?.sort((a, b) => b.average - a.average);
     chart.setOption({
       backgroundColor: '#fff',
       tooltip: {
@@ -178,7 +180,7 @@
       xAxis: [
         {
           type: 'category',
-          data: firstFloorList.value.map((item) => item.name),
+          data: data.map((item) => item.name),
           axisTick: {
             show: false, // 是否显示坐标轴轴线
           },
@@ -239,7 +241,7 @@
           barMaxWidth: 20,
           zlevel: 10,
           // barGap: '100%',
-          data: firstFloorList.value.map((item) => item.average),
+          data: data.map((item) => item.average),
           label: {
             show: true,
             position: 'top',
@@ -302,6 +304,7 @@
   });
   const getcontainererji = (name) => {
     let data = dataList.value.find((item: any) => item.name === name);
+    data.points?.sort((a, b) => b.score - a.score);
     let x = data.points.map((item: any) => item.pointName);
     let y = data.points.map((item: any) => item.score || 0);
     modalData.value.title = name + '的数据详情';

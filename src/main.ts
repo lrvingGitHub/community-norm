@@ -7,14 +7,23 @@ import api from "@/api/index" //接口文件
 import '@/mock';
 // 生产打包时可去除 ant-design-vue/dist/antd.variable.less 的引用。
 // 开发引入此包是为了加载优化，防止首次打开页面过慢
+import zhCN from 'ant-design-vue/es/locale/zh_CN'
 import 'ant-design-vue/dist/antd.variable.less';
 import 'stepin/es/style';
 // import 'default-passive-events';
 import '@/theme/index.less';
+import dayjs from 'dayjs'
+import 'dayjs/locale/zh-cn'
+
+// 设置 Day.js 语言为中文
+dayjs.locale('zh-cn')
 import { AuthPlugin, IconfontPlugin } from '@/plugins';
 
 const app = createApp(App);
 app.config.globalProperties.$api = api //引入接口文件
+// 设置全局语言为中文
+import { ConfigProvider } from 'ant-design-vue'
+app.component('a-config-provider', ConfigProvider)
 app.use(pinia);
 app.use(router);
 app.use(stepin, { router });

@@ -87,6 +87,11 @@ export const patrolcount = (data: any) => {
 export const updatePassword = (data: any) => {
     return http.request<any>('login/updatePassword', 'post_json', data)
 }
+export const exportPoint = (data: any) => {
+    return http.request<any>('file/exportPoint', 'get', data, {
+        responseType: 'blob' // 非常关键！告诉 axios 这是个二进制文件
+    })
+}
 
 
 

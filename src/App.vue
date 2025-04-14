@@ -1,5 +1,5 @@
 <template>
-  <a-config-provider :getPopupContainer="getPopupContainer">
+  <a-config-provider :locale="zhCN" :getPopupContainer="getPopupContainer">
     <ThemeProvider is-root v-bind="themeConfig" :apply-style="false" :color="{ primary: { DEFAULT: '#3B82F6' } }">
       <!-- logo-src="@/assets/vite.svg" -->
       <!-- :menuList="basicmenuList" -->
@@ -80,7 +80,7 @@
   import { configTheme, themeList } from '@/theme';
   import { ThemeProvider } from 'stepin';
   import { computed } from 'vue';
-
+  import zhCN from 'ant-design-vue/es/locale/zh_CN';
   const { proxy } = getCurrentInstance() as any;
   const { logout, profile } = useAccountStore();
 
@@ -113,8 +113,12 @@
       },
     ],
   });
+  // import { useAuthStore } from '@/plugins';
+  // const { setAuthorities } = useAuthStore();
+  // setAuthorities(permissions);
+
   let basicmenuList = ref([
-    { title: '工作台', path: '/', meta: { icon: 'DashboardOutlined' } },
+    { title: '工作台', path: '/', meta: { icon: 'DashboardOutlined', cacheable: false } },
     {
       path: '/point',
       name: 'point',
@@ -193,6 +197,13 @@
 
   const getUser = () => {
     let userDetail = JSON.parse(localStorage.getItem('userInfo') || '{}');
+    if (userDetail.roleName == '工作人员') {
+      basicmenuList.value = basicmenuList.value.filter((item) => item.title !== '系统配置');
+    } else if (userDetail.roleName == '访客') {
+      basicmenuList.value = basicmenuList.value.filter(
+        (item) => item.title !== '系统配置' && item.title !== '巡查管理' && item.title !== '点位管理'
+      );
+    }
     user.name = userDetail.name;
     user.avatar = 'https://img1.baidu.com/it/u=1090403966,2803330688&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=520';
     console.log('666', user);
@@ -213,11 +224,6 @@
     setTimeout(() => {
       editPwdRef.value.resetFields();
     }, 0);
-    // editPwd.value.formData = {
-    //   oldPassword: undefined,
-    //   newPassword: undefined,
-    //   againNewPassword: undefined,
-    // };
   };
 
   // 提交修改密码

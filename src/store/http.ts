@@ -10,6 +10,7 @@ const http = createHttp({
   withCredentials: true,
   xsrfCookieName: 'Authorization',
   xsrfHeaderName: 'Authorization',
+  responseType: 'blob'
 });
 
 const isAxiosResponse = (obj: any): obj is AxiosResponse => {

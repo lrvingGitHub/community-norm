@@ -2,13 +2,36 @@
   <div class="point">
     <!-- 搜索 -->
     <a-form :model="formState" name="search" class="search" autocomplete="off" layout="inline">
+      <a-form-item label="点位名称" name="pointId">
+        <a-select ref="select" placeholder="请选择点位名称" allowClear v-model:value="formState.pointId">
+          <a-select-option :value="item.uniqueId" v-for="item in pointList" :key="item.uniqueId">{{
+            item.name
+          }}</a-select-option>
+        </a-select>
+      </a-form-item>
+
+      <a-form-item label="所属网格员" name="inspectorId">
+        <a-select ref="select" placeholder="请选择网格员类型" allowClear v-model:value="formState.inspectorId">
+          <a-select-option :value="item.id" v-for="item in inspectorList" :key="item.id">{{
+            item.name
+          }}</a-select-option>
+        </a-select>
+      </a-form-item>
       <a-form-item label="所属关键字" name="keywords">
         <a-input v-model:value="formState.keywords" placeholder="请输入所属关键字" />
       </a-form-item>
-      <a-button type="primary" :icon="h(SearchOutlined)" @click="search()">搜索</a-button>
+      <a-form-item label="查询时间段" name="keywords">
+        <a-range-picker :placeholder="['开始时间', '结束时间']" :format="dateFormat" v-model:value="currentTime" />
+      </a-form-item>
+      <a-form-item label="" name="keywords">
+        <div>
+          <a-button type="primary" :icon="h(SearchOutlined)" @click="search()">搜索</a-button>
+          <!-- 新增 -->
+          <a-button type="primary" :icon="h(PlusOutlined)" class="addBtn" @click="openModal()">新增</a-button>
+        </div>
+      </a-form-item>
     </a-form>
-    <!-- 新增 -->
-    <a-button type="primary" :icon="h(PlusOutlined)" class="addBtn" @click="openModal()">新增</a-button>
+
     <!-- 表格 -->
     <a-table :data-source="userList" :pagination="pagination" row-key="id" @change="handleTableChange">
       <a-table-column key="index" title="序号" data-index="index" align="center">
@@ -101,13 +124,18 @@
   } from '@ant-design/icons-vue';
   import { useRouter } from 'vue-router';
   import { message, Modal } from 'ant-design-vue';
+  import dayjs, { Dayjs } from 'dayjs';
 
   const { proxy } = getCurrentInstance() as any;
 
   const router = useRouter();
   const formState = reactive<FormState>({
     keywords: '',
+    inspectorId: undefined,
+    pointId: undefined,
   });
+  let currentTime = ref('');
+  const dateFormat = 'YYYY-MM-DD';
   let modalRef = ref();
   const labelCol = { style: { width: '100px' } };
   let pagination = ref({
@@ -128,78 +156,7 @@
     pagination.value.pageSize = row.pageSize;
     getList(); // 重新获取数据
   };
-  const data = [
-    {
-      pointName: '金牛花园一期',
-      reseau: '网格A1',
-      reseauUser: '张伟',
-      address: '成都市金牛区金泉街道金牛花园路18号',
-      state: '正常',
-    },
-    {
-      pointName: '鑫福家苑',
-      reseau: '网格B2',
-      reseauUser: '李娜',
-      address: '成都市金牛区抚琴街道福运路55号',
-      state: '正常',
-    },
-    {
-      pointName: '绿地世纪城',
-      reseau: '网格C3',
-      reseauUser: '王强',
-      address: '成都市金牛区茶店子街道世纪大道99号',
-      state: '正常',
-    },
-    {
-      pointName: '北城家园',
-      reseau: '网格A2',
-      reseauUser: '赵敏',
-      address: '成都市金牛区营门口街道北城一路100号',
-      state: '维修中',
-    },
-    {
-      pointName: '嘉祥锦城',
-      reseau: '网格B1',
-      reseauUser: '陈静',
-      address: '成都市金牛区西安路68号',
-      state: '正常',
-    },
-    {
-      pointName: '金牛万达广场',
-      reseau: '网格C1',
-      reseauUser: '刘洋',
-      address: '成都市金牛区一环路北三段1号',
-      state: '正常',
-    },
-    {
-      pointName: '汇融名城',
-      reseau: '网格A3',
-      reseauUser: '孙涛',
-      address: '成都市金牛区沙湾路199号',
-      state: '正常',
-    },
-    {
-      pointName: '天府尚居',
-      reseau: '网格B3',
-      reseauUser: '郑媛',
-      address: '成都市金牛区天回镇街道兴盛路10号',
-      state: '异常',
-    },
-    {
-      pointName: '金泉新苑',
-      reseau: '网格C2',
-      reseauUser: '黄磊',
-      address: '成都市金牛区金泉街道金泉西路88号',
-      state: '正常',
-    },
-    {
-      pointName: '荣光小区',
-      reseau: '网格A4',
-      reseauUser: '蒋丽',
-      address: '成都市金牛区营门口街道荣光巷12号',
-      state: '正常',
-    },
-  ];
+  const data = [];
   //弹窗相关
   let modalData = ref({
     open: false,
@@ -240,10 +197,26 @@
     });
   };
   let userList = ref([]);
+  let inspectorList = ref([]);
+  const getinspectorList = () => {
+    proxy.$api.inspectorList({}).then((res: any) => {
+      if (res.data?.data) {
+        inspectorList.value = res.data?.data;
+      } else {
+        inspectorList.value = [];
+      }
+    });
+  };
+  getinspectorList();
+
   const getList = () => {
     proxy.$api
       .patrolselect({
+        startTime: currentTime?.value ? dayjs(currentTime.value[0]).format(dateFormat) : undefined,
+        endTime: currentTime?.value ? dayjs(currentTime.value[1]).format(dateFormat) : undefined,
         keywords: formState.keywords,
+        pointId: formState.pointId,
+        inspectorId: formState.inspectorId,
         pageIndex: pagination.value.current,
         pageSize: pagination.value.pageSize,
       })
@@ -263,6 +236,17 @@
         }
       });
   };
+  let pointList = ref([]);
+  const getpointList = () => {
+    proxy.$api.pointList({}).then((res: any) => {
+      if (res.data?.data) {
+        pointList.value = res.data.data;
+      } else {
+        pointList.value = [];
+      }
+    });
+  };
+  getpointList();
   const pointdel = (row) => {
     Modal.confirm({
       title: '提示',
@@ -312,17 +296,17 @@
     }
   }
   .addBtn {
-    margin: 15px 0;
+    margin-left: 15px;
   }
   .operationLine {
     .edit {
       color: #1677ff;
     }
   }
+  .ant-form-item {
+    margin-bottom: 20px;
+  }
   .modalForm {
-    .ant-form-item {
-      margin-bottom: 20px;
-    }
   }
   .score {
     font-size: 20px;

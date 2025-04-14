@@ -274,9 +274,9 @@
   };
   const resetPassword = (row) => {
     Modal.confirm({
-      title: '提示',
+      title: '你确定要重置该用户的密码？',
       icon: createVNode(ExclamationCircleOutlined),
-      content: '你确定要重置该用户的密码？',
+      content: '重置后的密码默认为Jksj@2025',
       okText: '确认',
       okType: 'danger',
       cancelText: '取消',

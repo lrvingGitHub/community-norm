@@ -54,7 +54,12 @@
             :show-upload-list="false"
             :before-upload="beforeUpload"
           >
-            <img v-if="formState.standImage" :src="fileUrl + formState.standImage" alt="avatar" style="width: 100%" />
+            <img
+              v-if="formState.standImage"
+              :src="fileUrl + formState.standImage"
+              alt="avatar"
+              style="width: 100%; height: 100%; object-fit: cover"
+            />
             <div v-else>
               <loading-outlined v-if="loading"></loading-outlined>
               <plus-outlined v-else></plus-outlined>

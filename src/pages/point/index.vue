@@ -9,6 +9,8 @@
     </a-form>
     <!-- 新增 -->
     <a-button type="primary" :icon="h(PlusOutlined)" class="addBtn" @click="openModal()">新增</a-button>
+    <a-button :icon="h(PlusOutlined)" class="exportBtn" @click="exportPoint()">导出</a-button>
+
     <!-- 表格 -->
     <a-table :data-source="userList" :pagination="pagination" row-key="id" @change="handleTableChange">
       <a-table-column key="index" title="序号" data-index="index" align="center">
@@ -93,7 +95,10 @@
   } from '@ant-design/icons-vue';
   import { useRouter } from 'vue-router';
   import { message, Modal } from 'ant-design-vue';
-
+  // exportHeader: 'http://192.168.120.214:4610/file'
+  import { useAccountStore } from '@/store';
+  const { getexportHeader } = useAccountStore();
+  let exportHeader = getexportHeader();
   const { proxy } = getCurrentInstance() as any;
 
   const router = useRouter();
@@ -120,78 +125,7 @@
     pagination.value.pageSize = row.pageSize;
     getList(); // 重新获取数据
   };
-  const data = [
-    {
-      pointName: '金牛花园一期',
-      reseau: '网格A1',
-      reseauUser: '张伟',
-      address: '成都市金牛区金泉街道金牛花园路18号',
-      state: '正常',
-    },
-    {
-      pointName: '鑫福家苑',
-      reseau: '网格B2',
-      reseauUser: '李娜',
-      address: '成都市金牛区抚琴街道福运路55号',
-      state: '正常',
-    },
-    {
-      pointName: '绿地世纪城',
-      reseau: '网格C3',
-      reseauUser: '王强',
-      address: '成都市金牛区茶店子街道世纪大道99号',
-      state: '正常',
-    },
-    {
-      pointName: '北城家园',
-      reseau: '网格A2',
-      reseauUser: '赵敏',
-      address: '成都市金牛区营门口街道北城一路100号',
-      state: '维修中',
-    },
-    {
-      pointName: '嘉祥锦城',
-      reseau: '网格B1',
-      reseauUser: '陈静',
-      address: '成都市金牛区西安路68号',
-      state: '正常',
-    },
-    {
-      pointName: '金牛万达广场',
-      reseau: '网格C1',
-      reseauUser: '刘洋',
-      address: '成都市金牛区一环路北三段1号',
-      state: '正常',
-    },
-    {
-      pointName: '汇融名城',
-      reseau: '网格A3',
-      reseauUser: '孙涛',
-      address: '成都市金牛区沙湾路199号',
-      state: '正常',
-    },
-    {
-      pointName: '天府尚居',
-      reseau: '网格B3',
-      reseauUser: '郑媛',
-      address: '成都市金牛区天回镇街道兴盛路10号',
-      state: '异常',
-    },
-    {
-      pointName: '金泉新苑',
-      reseau: '网格C2',
-      reseauUser: '黄磊',
-      address: '成都市金牛区金泉街道金泉西路88号',
-      state: '正常',
-    },
-    {
-      pointName: '荣光小区',
-      reseau: '网格A4',
-      reseauUser: '蒋丽',
-      address: '成都市金牛区营门口街道荣光巷12号',
-      state: '正常',
-    },
-  ];
+  const data = [];
   //弹窗相关
   let modalData = ref({
     open: false,
@@ -247,6 +181,10 @@
           userList.value = [];
         }
       });
+  };
+  // 导出
+  const exportPoint = () => {
+    window.open(`${exportHeader}/file/exportPoint`);
   };
   const pointdel = (row) => {
     Modal.confirm({
@@ -308,5 +246,11 @@
     .ant-form-item {
       margin-bottom: 20px;
     }
+  }
+  .exportBtn {
+    background: #67c23a;
+    color: #fff;
+    margin-left: 10px;
+    border-color: #67c23a;
   }
 </style>
